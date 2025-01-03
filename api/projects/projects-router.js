@@ -41,6 +41,11 @@ router.post('/', validateProject,  (req, res, next) => {
 });
 
 router.put('/:id',  (req, res, next) => {
+  const {name, description, completed} = req.body;
+  if(!name || !description || completed === undefined) {
+    res.status(400).json({message: "Missing required fields: name, description, and completed"});
+  }
+
   Projects.update(req.params.id, req.body)
     .then(updatedProject => {
       res.status(200).json(updatedProject);
@@ -50,7 +55,7 @@ router.put('/:id',  (req, res, next) => {
     }); 
   })
 
-router.delete('/:id',  (req, res, next) => {
+router.delete('/:id', validateProjectId, (req, res, next) => {
   Projects.remove(req.params.id)
     .then((result) => {
       if(result) {
@@ -62,6 +67,16 @@ router.delete('/:id',  (req, res, next) => {
     })
     .catch((error) => {
         next({message: "We ran into an error removing the project", error});
+    });
+});
+
+router.get('/:id/actions', validateProjectId, (req, res, next) => {
+  Projects.getProjectActions(req.params.id)
+    .then(actions => {
+      res.status(200).json(actions);
+    })
+    .catch((error) => {
+        next({message: "We ran into an error retrieving the actions", error});
     });
 });
 
