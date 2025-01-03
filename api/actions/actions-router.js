@@ -27,5 +27,22 @@ router.post('/', validateActionData, async (req, res, next) => {
         next({ message: "We ran into an error adding the action", error });
     }
 });
+router.put('/:id', validateActionId, validateActionData, async (req, res, next) => {
+    try {
+        const updatedAction = await Actions.update(req.params.id, req.body);
+        res.status(200).json(updatedAction);
+    } catch (error) {
+        next({ message: "We ran into an error updating the action", error });
+    }
+});
+
+router.delete('/:id', validateActionId, async (req, res, next) => { 
+    try {
+        await Actions.remove(req.params.id);
+        res.status(200).json({ message: "Action has been deleted" });
+    } catch (error) {
+        next({ message: "We ran into an error deleting the action", error });
+    }
+});
 
 module.exports = router;
